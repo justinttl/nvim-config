@@ -619,6 +619,23 @@ require('lazy').setup({
           end,
         },
       }
+
+      local border = {
+        { '┌', 'PMenuBorder' },
+        { '─', 'PMenuBorder' },
+        { '┐', 'PMenuBorder' },
+        { '│', 'PMenuBorder' },
+        { '┘', 'PMenuBorder' },
+        { '─', 'PMenuBorder' },
+        { '└', 'PMenuBorder' },
+        { '│', 'PMenuBorder' },
+      }
+      local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
+      function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
+        opts = opts or {}
+        opts.border = opts.border or border
+        return orig_util_open_floating_preview(contents, syntax, opts, ...)
+      end
     end,
   },
 
@@ -709,8 +726,12 @@ require('lazy').setup({
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
         window = {
-          completion = cmp.config.window.bordered(),
-          documentation = cmp.config.window.bordered(),
+          completion = cmp.config.window.bordered {
+            winhighlight = 'FloatBorder:PMenuBorder,CursorLine:PmenuSel,Search:None',
+          },
+          documentation = cmp.config.window.bordered {
+            winhighlight = 'FloatBorder:PMenuBorder,CursorLine:PmenuSel,Search:None',
+          },
         },
         -- For an understanding of why these mappings were
         -- chosen, you will need to read `:help ins-completion`
@@ -784,10 +805,13 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      vim.cmd.colorscheme 'tokyonight-moon'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
+
+      vim.cmd 'highlight! PMenuBorder guibg=NONE guifg=#589ed7'
+      vim.cmd 'highlight! link NormalFloat Normal'
     end,
   },
 
