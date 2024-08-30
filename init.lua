@@ -270,19 +270,26 @@ require('lazy').setup({
       require('which-key').setup()
 
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      require('which-key').add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>c_', hidden = true },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>d_', hidden = true },
+        { '<leader>h', group = 'Git [H]unk' },
+        { '<leader>h_', hidden = true },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>r_', hidden = true },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>s_', hidden = true },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>t_', hidden = true },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>w_', hidden = true },
       }
       -- visual mode
-      require('which-key').register({
-        ['<leader>h'] = { 'Git [H]unk' },
-      }, { mode = 'v' })
+      require('which-key').add {
+        { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
+      }
     end,
   },
 
@@ -339,16 +346,13 @@ require('lazy').setup({
 
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
+      local builtin = require 'telescope.builtin'
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
+        defaults = {},
+        pickers = {},
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -361,7 +365,6 @@ require('lazy').setup({
       pcall(require('telescope').load_extension, 'ui-select')
 
       -- See `:help telescope.builtin`
-      local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -371,7 +374,9 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader><leader>', function()
+        builtin.buffers { sort_mru = true, ignore_current_buffer = true }
+      end, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
@@ -408,6 +413,31 @@ require('lazy').setup({
         view_options = { show_hidden = true },
       }
       vim.keymap.set('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+    end,
+  },
+
+  -- Buffers as tab line
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      vim.opt.termguicolors = true
+      vim.opt.mousemoveevent = true
+
+      local bufferline = require 'bufferline'
+      bufferline.setup {
+        options = {
+          hover = {
+            enabled = true,
+            delay = 200,
+            reveal = { 'close' },
+          },
+          style_preset = {
+            bufferline.style_preset.no_italic,
+          },
+        },
+      }
     end,
   },
 
@@ -570,7 +600,29 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        pyright = {},
+        pyright = {
+          root_dir = function(fname)
+            local util = require 'lspconfig/util'
+            local root_files = {}
+            -- HACK: K-repo we want to find the nearest pyrightconfig
+            -- Modified from the default behavior here:
+            -- https://github.com/neovim/nvim-lspconfig/blob/e3371e11f8d8045a1d01905e59057530cea2b472/lua/lspconfig/server_configurations/pyright.lua
+            if string.find(fname, 'k-repo/python') then
+              root_files = { 'pyrightconfig.json' }
+            else
+              root_files = {
+                'pyproject.toml',
+                'setup.py',
+                'setup.cfg',
+                'requirements.txt',
+                'Pipfile',
+                'pyrightconfig.json',
+                '.git',
+              }
+            end
+            return util.root_pattern(unpack(root_files))(fname)
+          end,
+        },
         -- rust_analyzer = {},
         tsserver = {},
         --
@@ -667,11 +719,18 @@ require('lazy').setup({
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
+        python = function(bufnr)
+          -- if require('conform').get_formatter_info('ruff_format', bufnr).available then
+          --   return { 'ruff_format' }
+          -- else
+          --   return { 'isort', 'black' }
+          -- end
+          return { 'isort', 'black' }
+        end,
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        javascript = { { 'prettierd', 'prettier' } },
+        typescriptreact = { { 'prettierd', 'prettier' } },
       },
     },
   },
@@ -868,6 +927,7 @@ require('lazy').setup({
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
+        disable = { 'dockerfile' },
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
