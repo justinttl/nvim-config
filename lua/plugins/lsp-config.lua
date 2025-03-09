@@ -179,6 +179,18 @@ return { -- LSP Configuration & Plugins
           end
           return util.root_pattern(unpack(root_files))(fname)
         end,
+        settings = {
+          python = {
+            analysis = {
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = false,
+              diagnosticMode = 'openFilesOnly',
+              extraPaths = { '.' },
+              exclude = { '~' },
+            },
+          },
+          single_file_support = true,
+        },
       },
       -- rust_analyzer = {},
       ts_ls = {},
