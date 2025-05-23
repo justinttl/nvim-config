@@ -194,6 +194,7 @@ return { -- LSP Configuration & Plugins
       },
       -- rust_analyzer = {},
       ts_ls = {},
+      eslint = {},
       --
 
       lua_ls = {
