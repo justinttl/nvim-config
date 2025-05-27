@@ -9,10 +9,6 @@ return { -- LSP Configuration & Plugins
     -- Useful status updates for LSP.
     -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
     { 'j-hui/fidget.nvim', opts = {} },
-
-    -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-    -- used for completion, annotations and signatures of Neovim apis
-    { 'folke/neodev.nvim', opts = {} },
   },
   config = function()
     -- Brief aside: **What is LSP?**
@@ -93,8 +89,6 @@ return { -- LSP Configuration & Plugins
         --  See `:help K` for why this keymap.
         map('K', vim.lsp.buf.hover, 'Hover Documentation')
 
-        -- WARN: This is not Goto Definition, this is Goto Declaration.
-        --  For example, in C this would take you to the header.
         map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
         -- The following two autocommands are used to highlight references of the
@@ -241,22 +235,5 @@ return { -- LSP Configuration & Plugins
         end,
       },
     }
-
-    local border = {
-      { '┌', 'PMenuBorder' },
-      { '─', 'PMenuBorder' },
-      { '┐', 'PMenuBorder' },
-      { '│', 'PMenuBorder' },
-      { '┘', 'PMenuBorder' },
-      { '─', 'PMenuBorder' },
-      { '└', 'PMenuBorder' },
-      { '│', 'PMenuBorder' },
-    }
-    local orig_util_open_floating_preview = vim.lsp.util.open_floating_preview
-    function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
-      opts = opts or {}
-      opts.border = opts.border or border
-      return orig_util_open_floating_preview(contents, syntax, opts, ...)
-    end
   end,
 }
