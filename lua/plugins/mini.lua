@@ -18,7 +18,7 @@ return { -- Collection of various small independent plugins/modules
 
     require('mini.files').setup { -- Configuration options
       mappings = {
-        close = '',
+        close = '<ESC>',
         go_in = 'l',
         go_in_plus = '<CR>',
         go_out = 'h',
