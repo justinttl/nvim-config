@@ -189,8 +189,6 @@ return { -- LSP Configuration & Plugins
       -- rust_analyzer = {},
       ts_ls = {},
       eslint = {},
-      --
-
       lua_ls = {
         -- cmd = {...},
         -- filetypes = { ...},
@@ -205,6 +203,7 @@ return { -- LSP Configuration & Plugins
           },
         },
       },
+      terraformls = {},
     }
 
     -- Ensure the servers and tools above are installed

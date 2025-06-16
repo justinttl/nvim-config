@@ -17,9 +17,24 @@ return { -- Collection of various small independent plugins/modules
     require('mini.surround').setup()
 
     require('mini.files').setup { -- Configuration options
+      mappings = {
+        close = '',
+        go_in = 'l',
+        go_in_plus = '<CR>',
+        go_out = 'h',
+        go_out_plus = 'H',
+        mark_goto = "'",
+        mark_set = 'm',
+        reset = '<BS>',
+        reveal_cwd = '@',
+        show_help = 'g?',
+        synchronize = '=',
+        trim_left = '<',
+        trim_right = '>',
+      },
       windows = {
         preview = true, -- Show file preview
-        width_focus = 25,
+        width_focus = 50,
         width_nofocus = 15,
         width_preview = 50,
       },
