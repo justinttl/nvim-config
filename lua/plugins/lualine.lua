@@ -45,7 +45,7 @@ return {
         section_separators = { left = '', right = '' },
       },
       sections = {
-        lualine_a = { { 'mode', separator = { left = '' }, padding = { right = 2 } } },
+        lualine_a = { { 'mode', separator = { left = '' } } },
         lualine_b = { 'filename', 'branch' },
         lualine_c = {
           '%=',
@@ -61,7 +61,7 @@ return {
         },
         lualine_x = {},
         lualine_y = { 'filetype', 'progress' },
-        lualine_z = { { 'location', separator = { right = '' }, padding = { left = 2 } } },
+        lualine_z = { { 'location', separator = { right = '' } } },
       },
       inactive_sections = {
         lualine_a = { 'filename' },
