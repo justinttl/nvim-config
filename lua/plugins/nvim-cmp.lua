@@ -49,10 +49,12 @@ return { -- Autocompletion
       completion = { completeopt = 'menu,menuone,noinsert' },
       window = {
         completion = cmp.config.window.bordered {
-          winhighlight = 'FloatBorder:PMenuBorder,CursorLine:PmenuSel,Search:None',
+          border = 'rounded',
+          -- winhighlight = 'Normal:Normal,FloatBorder:FloatBorder,CursorLine:PMenuSel,Search:None',
         },
         documentation = cmp.config.window.bordered {
-          winhighlight = 'FloatBorder:PMenuBorder,CursorLine:PmenuSel,Search:None',
+          border = 'rounded',
+          -- winhighlight = 'Normal:Normal,FloatBorder:FloatBorder',
         },
       },
       -- For an understanding of why these mappings were
