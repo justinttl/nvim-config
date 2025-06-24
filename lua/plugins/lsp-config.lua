@@ -136,98 +136,66 @@ return { -- LSP Configuration & Plugins
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-    -- Enable the following language servers
-    --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-    --
-    --  Add any additional override configuration in the following tables. Available keys are:
-    --  - cmd (table): Override the default command used to start the server
-    --  - filetypes (table): Override the default list of associated filetypes for the server
-    --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
-    --  - settings (table): Override the default settings passed when initializing the server.
-    --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
-    local servers = {
-      pyright = {
-        root_dir = function(fname)
-          local util = require 'lspconfig/util'
-          local root_files = {}
-          -- HACK: K-repo we want to find the nearest pyrightconfig
-          -- Modified from the default behavior here:
-          -- https://github.com/neovim/nvim-lspconfig/blob/e3371e11f8d8045a1d01905e59057530cea2b472/lua/lspconfig/server_configurations/pyright.lua
-          if string.find(fname, 'k-repo/python') then
-            root_files = { 'pyrightconfig.json' }
-          else
-            root_files = {
-              'pyproject.toml',
-              'setup.py',
-              'setup.cfg',
-              'requirements.txt',
-              'Pipfile',
-              'pyrightconfig.json',
-              '.git',
-            }
-          end
-          return util.root_pattern(unpack(root_files))(fname)
-        end,
-        settings = {
-          python = {
-            analysis = {
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = false,
-              diagnosticMode = 'openFilesOnly',
-              extraPaths = { '.' },
-              exclude = { '~' },
-            },
-          },
-          single_file_support = true,
-        },
+    -- Setup Mason for tool installation
+    require('mason').setup()
+    require('mason-tool-installer').setup {
+      ensure_installed = {
+        'pyright',
+        'typescript-language-server',
+        'lua-language-server',
+        'terraform-ls',
       },
-      -- rust_analyzer = {},
-      ts_ls = {
-        root_dir = function(fname)
-          return require('lspconfig.util').root_pattern('.git', 'package.json')(fname)
-        end,
-      },
-      lua_ls = {
-        -- cmd = {...},
-        -- filetypes = { ...},
-        -- capabilities = {},
-        settings = {
-          Lua = {
-            completion = {
-              callSnippet = 'Replace',
-            },
-            -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-            diagnostics = { disable = { 'missing-parameter' } },
-          },
-        },
-      },
-      terraformls = {},
     }
 
-    -- Ensure the servers and tools above are installed
-    --  To check the current status of installed tools and/or manually install
-    --  other tools, you can run
-    --    :Mason
-    --
-    --  You can press `g?` for help in this menu.
-    require('mason').setup()
-
-    -- You can add other tools here that you want Mason to install
-    -- for you, so that they are available from within Neovim.
-    local ensure_installed = vim.tbl_keys(servers or {})
-    require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
-    require('mason-lspconfig').setup {
-      handlers = {
-        function(server_name)
-          local server = servers[server_name] or {}
-          -- This handles overriding only values explicitly passed
-          -- by the server configuration above. Useful when disabling
-          -- certain features of an LSP (for example, turning off formatting for tsserver)
-          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          require('lspconfig')[server_name].setup(server)
-        end,
+    -- Manual LSP setups (much cleaner!)
+    require('lspconfig').pyright.setup {
+      capabilities = capabilities,
+      root_dir = function(fname)
+        local util = require 'lspconfig/util'
+        local root_files = {
+          'pyrightconfig.json',
+          'pyproject.toml',
+          'setup.py',
+          'setup.cfg',
+          'requirements.txt',
+          'Pipfile',
+          '.git',
+        }
+        return util.root_pattern(unpack(root_files))(fname)
+      end,
+      settings = {
+        python = {
+          analysis = {
+            autoSearchPaths = true,
+            useLibraryCodeForTypes = true,
+            diagnosticMode = 'openFilesOnly',
+          },
+        },
       },
+      single_file_support = true,
+    }
+
+    require('lspconfig').ts_ls.setup {
+      capabilities = capabilities,
+      root_dir = function(fname)
+        return require('lspconfig.util').root_pattern('.git', 'package.json')(fname)
+      end,
+    }
+
+    require('lspconfig').lua_ls.setup {
+      capabilities = capabilities,
+      settings = {
+        Lua = {
+          completion = {
+            callSnippet = 'Replace',
+          },
+          diagnostics = { disable = { 'missing-parameter' } },
+        },
+      },
+    }
+
+    require('lspconfig').terraformls.setup {
+      capabilities = capabilities,
     }
   end,
 }
