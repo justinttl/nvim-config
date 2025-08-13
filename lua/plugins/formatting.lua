@@ -23,11 +23,12 @@ return {
     end,
     formatters_by_ft = {
       python = function(bufnr)
-        if require('conform').get_formatter_info('ruff_format', bufnr).available then
-          return { 'ruff_format' }
-        else
-          return { 'isort', 'black' }
-        end
+        -- if require('conform').get_formatter_info('ruff_format', bufnr).available then
+        --   return { 'ruff_format' }
+        -- else
+        --   return { 'isort', 'black' }
+        -- end
+        return { 'isort', 'black' }
       end,
       javascript = { 'prettierd' },
       typescript = { 'prettierd' },
@@ -38,7 +39,7 @@ return {
       scss = { 'prettierd' },
       html = { 'prettierd' },
       json = { 'prettierd' },
-      yaml = { 'prettierd' },
+      -- yaml = { 'prettierd' },
       markdown = { 'prettierd' },
       graphql = { 'prettierd' },
       lua = { 'stylua' },
