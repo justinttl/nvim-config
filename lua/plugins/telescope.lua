@@ -46,16 +46,28 @@ return {
     -- [[ Configure Telescope ]]
     -- See `:help telescope` and `:help telescope.setup()`
     local builtin = require 'telescope.builtin'
+    local actions = require 'telescope.actions'
+
     require('telescope').setup {
       -- You can put your default mappings / updates / etc. in here
       --  All the info you're looking for is in `:help telescope.setup()`
       --
-      defaults = {},
       pickers = {},
       extensions = {
         ['ui-select'] = {
           require('telescope.themes').get_dropdown(),
         },
+      },
+      defaults = {
+        mappings = {
+          i = {
+            ['<c-d>'] = actions.delete_buffer,
+          },
+          n = {
+            ['<c-d>'] = actions.delete_buffer,
+          },
+        },
+        path_display = { 'smart' },
       },
     }
 
