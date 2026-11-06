@@ -16,7 +16,7 @@ been split into modules and reworked around Neovim 0.11's native LSP API.
 ## Install
 
 ```sh
-git clone https://github.com/justinttl/kickstart.nvim.git ~/.config/nvim
+git clone https://github.com/justinttl/nvim-config.git ~/.config/nvim
 nvim
 ```
 
