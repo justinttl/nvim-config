@@ -56,3 +56,18 @@ vim.opt.hlsearch = true
 -- Disable netrw
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+
+-- Disable wrap for markdown
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'markdown' },
+  callback = function()
+    vim.opt_local.wrap = false
+  end,
+})
+
+-- Allow nvim to detech file changes from external sources --
+vim.opt.autoread = true
+vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold' }, {
+  pattern = '*',
+  command = 'silent! checktime',
+})

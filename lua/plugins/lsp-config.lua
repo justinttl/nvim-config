@@ -119,7 +119,17 @@ return { -- LSP Configuration & Plugins
       },
     }
 
-    -- Enable servers (configs auto-discovered from lsp/ directory)
+    -- Apply per-server overrides from ~/.config/nvim/lsp/<name>.lua.
+    -- We dofile() each one and pass it through vim.lsp.config so it
+    -- deep-merges over nvim-lspconfig's bundled defaults. (Relying on
+    -- runtimepath discovery alone causes lspconfig's lsp/<name>.lua to
+    -- shadow ours.)
+    local lsp_dir = vim.fn.stdpath('config') .. '/lsp'
+    for _, file in ipairs(vim.fn.glob(lsp_dir .. '/*.lua', false, true)) do
+      local name = vim.fn.fnamemodify(file, ':t:r')
+      vim.lsp.config(name, dofile(file))
+    end
+
     vim.lsp.enable { 'pyright', 'ts_ls', 'lua_ls', 'terraformls' }
   end,
 }
