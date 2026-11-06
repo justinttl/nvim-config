@@ -116,6 +116,7 @@ return { -- LSP Configuration & Plugins
         'typescript-language-server',
         'lua-language-server',
         'terraform-ls',
+        'gopls',
       },
     }
 
@@ -130,6 +131,6 @@ return { -- LSP Configuration & Plugins
       vim.lsp.config(name, dofile(file))
     end
 
-    vim.lsp.enable { 'pyright', 'ts_ls', 'lua_ls', 'terraformls' }
+    vim.lsp.enable { 'pyright', 'ts_ls', 'lua_ls', 'terraformls', 'gopls' }
   end,
 }
